@@ -1,0 +1,3 @@
+{
+  "common": { "home": "Accueil", "transactions": "Transactions", "expenses": "Dépenses", "sales": "Ventes", "purchases": "Achats", "inventory": "Produits et stock", "customers": "Clients", "suppliers": "Fournisseurs", "trips": "Voyages d'affaires", "cashflow": "Trésorerie", "reports": "Rapports", "ai": "UPMERA AI", "insights": "Conseiller IA", "goals": "Objectifs", "debts": "Dettes et paiements", "receipts": "Scanner de reçus", "invoices": "Factures", "team": "Équipe", "stores": "Boutiques", "billing": "Abonnement", "settings": "Paramètres" }
+}

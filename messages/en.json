@@ -1,0 +1,3 @@
+{
+  "common": { "home": "Home", "transactions": "Transactions", "expenses": "Expenses", "sales": "Sales", "purchases": "Purchases", "inventory": "Products & Inventory", "customers": "Customers", "suppliers": "Suppliers", "trips": "Business Trips", "cashflow": "Cash Flow", "reports": "Reports", "ai": "UPMERA AI", "insights": "AI Advisor", "goals": "Goals", "debts": "Debts & Payments", "receipts": "Receipt Scanner", "invoices": "Invoices", "team": "Team", "stores": "Locations", "billing": "Plan & Billing", "settings": "Settings" }
+}
