@@ -16,13 +16,28 @@ const responses: Record<string, string> = {
   improve: "Three practical opportunities stand out: (1) replenish out-of-stock cotton totes, which have a strong unit margin; (2) follow up on $325 in customer balances to improve available cash; and (3) compare transport options, since travel costs increased 18%. These are suggestions from sample data, not professional financial advice.",
 };
 
-export async function askUpmera(message: string): Promise<string> {
+const frenchResponses: Record<keyof typeof responses, string> = {
+  month: "Votre bénéfice net estimé ce mois-ci est de **3 420 $**, sur la base de **12 480 $** de ventes terminées, du coût estimé des marchandises vendues et de **4 380 $** de charges d’exploitation. Les achats de stock ne sont pas comptés comme des charges : seul le coût des produits vendus est inclus. La trésorerie disponible est distincte et s’élève à **8 420 $**.",
+  product: "Vos **paniers tressés** et sacs en coton offrent les meilleures marges. Le panier coûte 8 $ et se vend 15 $, soit une marge brute d’environ 47 %. Le sac en coton présente une marge unitaire encore supérieure, mais le stock est épuisé. Un réapprovisionnement pourrait répondre à la demande.",
+  expenses: "Les frais de transport ont augmenté de **18 %** ce mois-ci, principalement à cause de votre déplacement d’approvisionnement de novembre. Celui-ci reste rentable : 1 120 $ de revenus, contre 640 $ de marchandises et 186 $ de frais de déplacement. Comparer les tarifs de transport pourrait préserver votre marge.",
+  trip: "Votre déplacement d’approvisionnement de novembre a généré un bénéfice net estimé à **294 $** : 1 120 $ de revenus moins 640 $ de marchandises et 186 $ de frais de déplacement. Le résultat est positif. Comparez-le à votre déplacement d’octobre pour repérer les meilleurs itinéraires et fournisseurs.",
+  afford: "La trésorerie estimée de la démonstration est de **8 420 $**. Un achat de stock de 500 $ laisserait environ 7 920 $, avant les engagements non enregistrés. D’après les données saisies, cela semble raisonnable, mais vérifiez les paiements fournisseurs et salaires à venir avant de décider.",
+  improve: "Trois pistes concrètes se dégagent : (1) réapprovisionner les sacs en coton, dont la marge unitaire est élevée ; (2) relancer les clients pour 325 $ de soldes dus ; (3) comparer les options de transport, dont le coût a augmenté de 18 %. Ces suggestions reposent sur des données d’exemple et ne constituent pas un conseil financier.",
+};
+
+export async function askUpmera(message: string, language: "en" | "fr" = "en"): Promise<string> {
   await new Promise((resolve) => setTimeout(resolve, 850 + Math.random() * 500));
   const text = message.toLowerCase();
-  if (text.includes("earn") || text.includes("profit") || text.includes("month")) return responses.month;
-  if (text.includes("product") || text.includes("sell")) return responses.product;
-  if (text.includes("expense") || text.includes("increase") || text.includes("transport")) return responses.expenses;
-  if (text.includes("trip") || text.includes("travel")) return responses.trip;
-  if (text.includes("afford") || text.includes("stock") || text.includes("$500")) return responses.afford;
-  return responses.improve;
+  const french = language === "fr";
+  const has = (...terms: string[]) => terms.some((term) => text.includes(term));
+  let response: keyof typeof responses;
+
+  if (has("earn", "profit", "month", "gagn", "bénéfice", "revenu", "mois")) response = "month";
+  else if (has("product", "sell", "produit", "vente", "vendre", "marge")) response = "product";
+  else if (has("expense", "increase", "transport", "dépense", "frais", "augment")) response = "expenses";
+  else if (has("trip", "travel", "voyage", "déplacement")) response = "trip";
+  else if (has("afford", "stock", "$500", "500", "acheter", "achat")) response = "afford";
+  else response = "improve";
+
+  return french ? frenchResponses[response] : responses[response];
 }

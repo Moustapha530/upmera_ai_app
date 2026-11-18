@@ -13,6 +13,7 @@ import { formatCurrency } from "@/lib/format";
 import type { BusinessTrip, Customer, Goal, Invoice, Supplier, TeamMember, Transaction } from "@/types";
 import { Modal } from "@/components/ui/primitives";
 import { Check, Upload } from "lucide-react";
+import { useAppTranslation } from "@/components/i18n/use-app-translation";
 
 export type EntityKind = "transaction" | "expense" | "product" | "customer" | "supplier" | "trip" | "sale" | "purchase" | "invoice" | "invite" | "goal" | "payment-customer" | "payment-supplier" | "auth";
 
@@ -60,6 +61,7 @@ const titles: Record<EntityKind, string> = { transaction: "Add transaction", exp
 const subtitles: Record<EntityKind, string> = { transaction: "Keep a clear record of what happened in your business.", expense: "Track a business expense. Inventory purchases belong in Purchases, not Expenses.", product: "Add an item to your catalog and start tracking stock.", customer: "Save a customer contact and keep their purchase history organized.", supplier: "Add a supplier to your business directory.", trip: "Track travel costs separately from merchandise investment.", sale: "Sale totals are calculated automatically and stock is updated when saved.", purchase: "Record a stock purchase. It is not counted as an operating expense.", invoice: "Create a customer invoice. This demo does not send invoices externally.", invite: "Add a demo team member. No email invitation will be sent.", goal: "Set a measurable goal and track progress in your dashboard.", "payment-customer": "Record a partial or full payment against a balance.", "payment-supplier": "Record a partial or full payment against a supplier balance.", auth: "Demo account setup only. Authentication is not connected yet." };
 
 export function EntityModal({ kind, onClose, onDone }: { kind: EntityKind; onClose: () => void; onDone?: () => void }) {
+  const translate = useAppTranslation();
   const schema = schemas[kind];
   const form = useForm<EntityFormValues>({ resolver: zodResolver(schema as never) as unknown as Resolver<EntityFormValues>, defaultValues: { date: today, startDate: today, endDate: today, dueDate: today, type: kind === "expense" ? "expense" : "sale", amount: undefined, quantity: 1, discount: 0, shipping: 0, fees: 0, tax: 0, stock: 0, threshold: 10, purchasePrice: undefined, sellingPrice: undefined, paymentMethod: "Mobile money", category: kind === "expense" ? "Transportation" : "Retail sales", role: "Salesperson", unit: "currency", country: "Democratic Republic of the Congo", language: "English" } });
   const addTransaction = useAppData((state) => state.addTransaction);
@@ -170,26 +172,26 @@ export function EntityModal({ kind, onClose, onDone }: { kind: EntityKind; onClo
     onDone?.();
   }
 
-  return <Modal title={titles[kind]} description={subtitles[kind]} onClose={onClose} wide={kind === "product" || kind === "transaction" || kind === "trip" || kind === "purchase"}>
+  return <Modal title={translate(titles[kind])} description={translate(subtitles[kind])} onClose={onClose} wide={kind === "product" || kind === "transaction" || kind === "trip" || kind === "purchase"}>
     <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
       <div className="form-grid">{fields.map((field) => {
         const error = form.formState.errors[field.name]?.message as string | undefined;
         const value = watchedValues[field.name];
         return <div className={`form-field ${field.full ? "span-2" : ""}`} key={field.name}>
-          <label htmlFor={field.name}>{field.label}{field.required && <span className="text-[#d6a65b]"> *</span>}</label>
-          {field.type === "textarea" ? <textarea id={field.name} className="textarea" placeholder={field.placeholder || "Add any useful context..."} {...form.register(field.name)} />
-            : field.type === "select" ? <select id={field.name} className="input" {...form.register(field.name)}><option value="">Select {field.label.toLowerCase()}</option>{field.options?.map((option) => <option value={option} key={option}>{option}</option>)}</select>
-              : field.type === "file" ? <label className="flex min-h-18 cursor-pointer items-center justify-center gap-2 rounded-[9px] border border-dashed border-[#3b473e] bg-[#111512] px-3 text-[10px] text-[#929c94]"><Upload size={15} />{fileName || "Choose a file or take a photo"}<input type="file" className="hidden" accept="image/*" onChange={(event) => setFileName(event.target.files?.[0]?.name || "")} /></label>
-                : <input id={field.name} type={field.type || "text"} step={field.type === "number" ? "0.01" : undefined} min={field.type === "number" ? 0 : undefined} className="input" placeholder={field.placeholder} {...form.register(field.name)} />}
-          {field.hint && <span className="form-hint">{field.hint}</span>}{error && <span className="field-error">{error}</span>}
-          {kind === "sale" && field.name === "discount" && <span className="form-hint">Subtotal after discount: {formatCurrency(calculatedTotal)}</span>}
-          {kind === "product" && field.name === "sellingPrice" && value && watchedValues.purchasePrice && Number(value) < Number(watchedValues.purchasePrice) && <span className="field-error">Selling price is below purchase cost.</span>}
+          <label htmlFor={field.name}>{translate(field.label)}{field.required && <span className="text-[#d6a65b]"> *</span>}</label>
+          {field.type === "textarea" ? <textarea id={field.name} className="textarea" placeholder={translate(field.placeholder || "Add any useful context...")} {...form.register(field.name)} />
+            : field.type === "select" ? <select id={field.name} className="input" {...form.register(field.name)}><option value="">{translate("Select")}</option>{field.options?.map((option) => <option value={option} key={option}>{["product", "customer", "supplier", "trip", "customerId", "supplierId"].includes(field.name) && option !== "None" && option !== "Walk-in customer" ? option : translate(option)}</option>)}</select>
+              : field.type === "file" ? <label className="flex min-h-18 cursor-pointer items-center justify-center gap-2 rounded-[9px] border border-dashed border-[#3b473e] bg-[#111512] px-3 text-[10px] text-[#929c94]"><Upload size={15} />{fileName || translate("Choose a file or take a photo")}<input type="file" className="hidden" accept="image/*" onChange={(event) => setFileName(event.target.files?.[0]?.name || "")} /></label>
+                : <input id={field.name} type={field.type || "text"} step={field.type === "number" ? "0.01" : undefined} min={field.type === "number" ? 0 : undefined} className="input" placeholder={field.placeholder ? translate(field.placeholder) : undefined} {...form.register(field.name)} />}
+          {field.hint && <span className="form-hint">{translate(field.hint)}</span>}{error && <span className="field-error">{translate(error)}</span>}
+          {kind === "sale" && field.name === "discount" && <span className="form-hint">{translate("Subtotal after discount:")} {formatCurrency(calculatedTotal)}</span>}
+          {kind === "product" && field.name === "sellingPrice" && value && watchedValues.purchasePrice && Number(value) < Number(watchedValues.purchasePrice) && <span className="field-error">{translate("Selling price is below purchase cost.")}</span>}
         </div>;
       })}</div>
-      {kind === "sale" && <div className="mt-4 flex items-center justify-between rounded-xl border border-[#344138] bg-[#1a211b] p-3"><div><div className="text-[10px] text-[#89958c]">Sale total</div><div className="mt-1 text-[17px] font-semibold">{formatCurrency(calculatedTotal)}</div></div><div className="text-right text-[9px] text-[#748078]">Quantity × unit price − discount<br />Stock updates on save</div></div>}
-      {kind === "invoice" && <div className="mt-4 flex items-center justify-between rounded-xl border border-[#344138] bg-[#1a211b] p-3"><div><div className="text-[10px] text-[#89958c]">Invoice total</div><div className="mt-1 text-[17px] font-semibold">{formatCurrency(calculatedInvoiceTotal)}</div></div><div className="text-right text-[9px] text-[#748078]">Subtotal + tax − discount<br />No invoice is sent in demo mode</div></div>}
-      {kind === "expense" && <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#4c442e] bg-[#29241a] p-3 text-[9px] leading-relaxed text-[#d3b77d]"><Check size={13} className="mt-0.5 shrink-0" /> Inventory purchases should be recorded under Purchases. They reduce cash now, while product cost is recognized when items are sold.</div>}
-      <div className="modal-footer"><button type="button" className="btn btn-secondary" onClick={onClose}>Cancel</button><button type="submit" disabled={form.formState.isSubmitting} className="btn btn-primary">{form.formState.isSubmitting ? "Saving…" : kind === "sale" ? "Save sale" : kind === "purchase" ? "Save purchase" : kind === "auth" ? "Create account" : "Save changes"}</button></div>
+      {kind === "sale" && <div className="mt-4 flex items-center justify-between rounded-xl border border-[#344138] bg-[#1a211b] p-3"><div><div className="text-[10px] text-[#89958c]">{translate("Sale total")}</div><div className="mt-1 text-[17px] font-semibold">{formatCurrency(calculatedTotal)}</div></div><div className="text-right text-[9px] text-[#748078]">{translate("Quantity × unit price − discount")}<br />{translate("Stock updates on save")}</div></div>}
+      {kind === "invoice" && <div className="mt-4 flex items-center justify-between rounded-xl border border-[#344138] bg-[#1a211b] p-3"><div><div className="text-[10px] text-[#89958c]">{translate("Invoice total")}</div><div className="mt-1 text-[17px] font-semibold">{formatCurrency(calculatedInvoiceTotal)}</div></div><div className="text-right text-[9px] text-[#748078]">{translate("Subtotal + tax − discount")}<br />{translate("No invoice is sent in demo mode")}</div></div>}
+      {kind === "expense" && <div className="mt-3 flex items-start gap-2 rounded-lg border border-[#4c442e] bg-[#29241a] p-3 text-[9px] leading-relaxed text-[#d3b77d]"><Check size={13} className="mt-0.5 shrink-0" />{translate("Inventory purchases should be recorded under Purchases. They reduce cash now, while product cost is recognized when items are sold.")}</div>}
+      <div className="modal-footer"><button type="button" className="btn btn-secondary" onClick={onClose}>{translate("Cancel")}</button><button type="submit" disabled={form.formState.isSubmitting} className="btn btn-primary">{form.formState.isSubmitting ? translate("Saving…") : kind === "sale" ? translate("Save sale") : kind === "purchase" ? translate("Save purchase") : kind === "auth" ? translate("Create account") : translate("Save changes")}</button></div>
     </form>
   </Modal>;
 }
