@@ -111,7 +111,9 @@ Un appel direct du navigateur au backend est aussi possible, mais nécessite alo
 | Synthèses | `GET /api/v1/reports/summary`, endpoints d’indicateurs et d’analyses IA |
 | Fonctionnalités externes | analyse OCR, envoi d’e-mails, export PDF et paiement via des services dédiés côté serveur |
 
-Les types de référence se trouvent dans `types/index.ts` (`Transaction`, `Product`, `Customer`, `Supplier`, `Invoice`, etc.). Se mettre d’accord sur les champs, les statuts, les formats de date et la devise ; le backend doit notamment éviter les erreurs d’arrondi monétaire (par exemple en utilisant des montants décimaux ou des unités monétaires mineures avec une convention documentée). Les règles de calcul financier doivent être partagées et testées entre frontend et backend.
+Les types de référence se trouvent dans `types/index.ts` (`Transaction`, `Product`, `Customer`, `Supplier`, `Invoice`, etc.). Pour préparer les modèles, validations et serializers côté API, consulter le contrat détaillé des champs dans [`docs/api-serializers.md`](docs/api-serializers.md). Il couvre notamment les transactions, dépenses, produits, clients, fournisseurs, déplacements, ventes, achats, factures, paiements, objectifs, équipe, authentification, configuration initiale, OCR et magasins.
+
+Se mettre d’accord sur les champs, les statuts, les formats de date et la devise ; le backend doit notamment éviter les erreurs d’arrondi monétaire (par exemple en utilisant des montants décimaux ou des unités monétaires mineures avec une convention documentée). Les règles de calcul financier doivent être partagées et testées entre frontend et backend.
 
 ### Checklist pour l’équipe
 
